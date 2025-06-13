@@ -1,93 +1,16 @@
-'use client';
-import { Button } from '@/components/ui/button';
-import { authClient } from '@/lib/auth-client';
-import { useState } from 'react';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-export default function Home() {
-  const { data: session } = authClient.useSession();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+import { auth } from '@/lib/auth';
+import { HomeView } from '@/modules/home/ui/views/home-view';
 
-  const onSubmit = () => {
-    authClient.signUp.email(
-      {
-        email,
-        password,
-        name,
-      },
-      {
-        onSuccess: () => {
-          window.alert('Success');
-        },
-        onError: () => {
-          window.alert('Something went wrong');
-        },
-      }
-    );
-  };
-  const onLogin = () => {
-    authClient.signIn.email(
-      {
-        email,
-        password,
-      },
-      {
-        onSuccess: () => {
-          window.alert('Success');
-        },
-        onError: () => {
-          window.alert('Something went wrong');
-        },
-      }
-    );
-  };
+export default async function Home() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (session) {
-    return (
-      <div className="flex flex-col p-4 gap-y-4">
-        <p>Logged in as {session.user.name}</p>
-        <Button onClick={() => authClient.signOut()}>Sign Out</Button>
-      </div>
-    );
+  if (!session) {
+    redirect('/sign-in');
   }
-
-  return (
-    <div className="flex flex-col p-4 gap-y-10">
-      <div className="border border-amber-300  flex flex-col p-4 gap-y-4">
-        <input
-          type="text"
-          placeholder="name"
-          onChange={(e) => setName(e.target.value)}
-          value={name}
-        />
-        <input
-          type="email"
-          placeholder="email"
-          onChange={(e) => setEmail(e.target.value)}
-          value={email}
-        />
-        <input
-          type="password"
-          placeholder="password"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
-        />
-        <Button onClick={onSubmit}>Create User</Button>
-      </div>
-      <input
-        type="email"
-        placeholder="email"
-        onChange={(e) => setEmail(e.target.value)}
-        value={email}
-      />
-      <input
-        type="password"
-        placeholder="password"
-        onChange={(e) => setPassword(e.target.value)}
-        value={password}
-      />
-      <Button onClick={onLogin}>Sign in</Button>
-    </div>
-  );
+  return <HomeView />;
 }

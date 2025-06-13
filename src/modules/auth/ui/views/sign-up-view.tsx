@@ -3,8 +3,9 @@ import { z } from 'zod';
 import { Loader2, OctagonAlertIcon } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { FaGithub, FaGoogle } from 'react-icons/fa6';
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -61,12 +62,32 @@ export const SignUpView = () => {
       },
       {
         onSuccess: () => {
-          router.push('/');
+          setPending(false);
+          redirect('/');
+        },
+        onError: ({ error }) => {
+          setPending(false);
+          setError(error.message);
+        },
+      }
+    );
+  };
+  const onSocial = (provider: 'google' | 'github') => {
+    setError(null);
+    setPending(true);
+
+    authClient.signIn.social(
+      {
+        provider: provider,
+        callbackURL: '/',
+      },
+      {
+        onSuccess: () => {
           setPending(false);
         },
         onError: ({ error }) => {
-          setError(error.message);
           setPending(false);
+          setError(error.message);
         },
       }
     );
@@ -169,11 +190,21 @@ export const SignUpView = () => {
                   </span>
                 </section>
                 <section className="grid grid-cols-2 gap-4">
-                  <Button variant="outline" type="button" className="w-full">
-                    Google
+                  <Button
+                    variant="outline"
+                    onClick={() => onSocial('google')}
+                    type="button"
+                    className="w-full"
+                  >
+                    <FaGoogle />
                   </Button>
-                  <Button variant="outline" type="button" className="w-full">
-                    Github
+                  <Button
+                    onClick={() => onSocial('github')}
+                    variant="outline"
+                    type="button"
+                    className="w-full"
+                  >
+                    <FaGithub />
                   </Button>
                 </section>
                 <section className="text-center text-sm">
