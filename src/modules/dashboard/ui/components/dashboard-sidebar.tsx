@@ -1,3 +1,4 @@
+'use client';
 import { cn } from '@/lib/utils';
 import { BotIcon, StarIcon, VideoIcon } from 'lucide-react';
 import Image from 'next/image';
@@ -16,6 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { DashboardUserButton } from './dashboard-user-button';
+import { usePathname } from 'next/navigation';
 
 const firstSection = [
   {
@@ -38,8 +40,7 @@ const secondSection = [
 ];
 
 const DashboardSidebar = () => {
-  //const pathname = usePathname();
-  const pathname = '/agents';
+  const pathname = usePathname();
   return (
     <Sidebar>
       <SidebarHeader className="text-sidebar-accent-foreground">
